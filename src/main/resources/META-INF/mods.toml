@@ -64,3 +64,9 @@ Data-driven applicable spices for all the foods!
    versionRange="[1.19.2,1.20)"
    ordering="NONE"
    side="BOTH"
+[[dependencies.spiceshelf]]
+   modId="jei"
+   mandatory=false
+   versionRange="[11.6.0.1015,)"
+   ordering="NONE"
+   side="BOTH"
