@@ -1,7 +1,9 @@
 package qinomed.spiceshelf.util;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
 import qinomed.spiceshelf.SpiceShelf;
@@ -22,5 +24,15 @@ public class EffectStringUtil {
 
     public static String effectToString(MobEffectInstance effect) {
         return String.join(" ", ForgeRegistries.MOB_EFFECTS.getKey(effect.getEffect()).toString(), Integer.toString(effect.getDuration()/20), Integer.toString(effect.getAmplifier()), Boolean.toString(effect.isVisible()));
+    }
+
+    public static String effectToCoolerString(MobEffectInstance effect) {
+        var s = effect.getEffect().getDisplayName().getString();
+        if (effect.getAmplifier() > 0)
+            s = s.concat(" " + Component.translatable("potion.potency." + effect.getAmplifier()));
+        if (effect.getDuration() > 20)
+            s = s.concat(" (" + MobEffectUtil.formatDuration(effect, 1) + ")");
+
+        return s;
     }
 }

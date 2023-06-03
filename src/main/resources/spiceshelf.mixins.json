@@ -1,7 +1,7 @@
 {
-  "required": true,
+  "required": false,
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_8",
   "refmap": "spiceshelf.refmap.json",
-  "package": "qinomed.spiceshelf"
+  "package": "qinomed.spiceshelf.mixin"
 }

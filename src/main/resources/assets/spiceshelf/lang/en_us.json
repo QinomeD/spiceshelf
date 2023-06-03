@@ -1,5 +1,8 @@
 {
-  "spiceshelf.applicable_to_food": "Applicable on food (with a right-click)",
+  "spiceshelf.when_applied": "When applied on food:",
+  "spiceshelf.apply_effect": "Applies %s",
+
+  "jei.spice_conversion": "Spice Conversion",
 
   "spice.minecraft.sugar": "Sweetened"
 }
