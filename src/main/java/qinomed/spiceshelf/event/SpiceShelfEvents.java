@@ -107,8 +107,8 @@ public class SpiceShelfEvents {
     @SubscribeEvent
     public static void renderTooltip(ItemTooltipEvent event) {
         var stack = event.getItemStack();
-        var tag = stack.getOrCreateTag();
-        if (tag.contains("spices")) {
+        var tag = stack.getTag();
+        if (tag != null && tag.contains("spices")) {
             var spicesTag = tag.getCompound("spices");
             var spices = spicesTag.getAllKeys().stream().toList();
             spices.forEach(s -> event.getToolTip().add(spices.indexOf(s)+1, Component.translatable("spice." + StringUtils.replace(s, ":", "."))
