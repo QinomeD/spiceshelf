@@ -85,7 +85,7 @@ public class SpiceShelfEvents {
 
                 playSoundFromID(recipe.getSoundID(), level, player.getOnPos());
             } else if (spiceEffects.containsKey(spiceID) && stackedOn.getItem().isEdible()) {
-                if (!stackedOn.is(SpiceShelfTags.SPICE_BLACKLIST) && !stackedOn.getOrCreateTag().getCompound("spices").contains(String.valueOf(spiceID))) {
+                if (!stackedOn.is(SpiceShelfTags.SPICE_BLACKLIST)) {
                     event.setCanceled(true);
 
                     var spices = stackedOn.getOrCreateTag().getCompound("spices");
