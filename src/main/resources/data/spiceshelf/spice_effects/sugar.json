@@ -1,4 +1,4 @@
 {
   "item": "minecraft:sugar",
-  "effect": "minecraft:speed 10 0 false"
+  "effects": ["minecraft:speed 10 0 false", "minecraft:jump_boost 10 0 false"]
 }

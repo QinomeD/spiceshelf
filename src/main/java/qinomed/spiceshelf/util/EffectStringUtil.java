@@ -22,6 +22,15 @@ public class EffectStringUtil {
         return null;
     }
 
+    public static MobEffectInstance[] getAllEffects(String[] arr) {
+        MobEffectInstance[] ret = new MobEffectInstance[arr.length];
+        for (int i = 0; i < arr.length; i++) {
+            var s = arr[i];
+            ret[i] = getEffect(s);
+        }
+        return ret;
+    }
+
     public static String effectToString(MobEffectInstance effect) {
         return String.join(" ", ForgeRegistries.MOB_EFFECTS.getKey(effect.getEffect()).toString(), Integer.toString(effect.getDuration()/20), Integer.toString(effect.getAmplifier()), Boolean.toString(effect.isVisible()));
     }

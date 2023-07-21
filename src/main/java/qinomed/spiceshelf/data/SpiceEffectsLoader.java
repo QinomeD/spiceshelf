@@ -15,15 +15,15 @@ import java.util.Map;
 
 public class SpiceEffectsLoader extends SimpleJsonResourceReloadListener {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer()).create();
-    private Map<ResourceLocation, MobEffectInstance> spiceEffects = new HashMap<>();
+    private Map<ResourceLocation, MobEffectInstance[]> spiceEffects = new HashMap<>();
 
     public static class SpiceEffect {
         public ResourceLocation item;
-        public String effect;
+        public String[] effects;
 
-        public SpiceEffect(ResourceLocation item, String effect) {
+        public SpiceEffect(ResourceLocation item, String[] effects) {
             this.item = item;
-            this.effect = effect;
+            this.effects = effects;
         }
     }
 
@@ -36,11 +36,11 @@ public class SpiceEffectsLoader extends SimpleJsonResourceReloadListener {
         this.spiceEffects.clear();
         jsonMap.forEach((location, spiceEffect) -> {
             var effect = GSON.fromJson(spiceEffect, SpiceEffect.class);
-            spiceEffects.put(effect.item, EffectStringUtil.getEffect(effect.effect));
+            spiceEffects.put(effect.item, EffectStringUtil.getAllEffects(effect.effects));
         });
     }
 
-    public Map<ResourceLocation, MobEffectInstance> getSpiceEffects() {
+    public Map<ResourceLocation, MobEffectInstance[]> getSpiceEffects() {
         return spiceEffects;
     }
 

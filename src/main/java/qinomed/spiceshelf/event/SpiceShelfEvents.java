@@ -14,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.ItemStackedOnOtherEvent;
+import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -35,9 +36,23 @@ public class SpiceShelfEvents {
     public static final SpiceEffectsLoader SPICE_EFFECTS_LOADER = new SpiceEffectsLoader();
 
     @SubscribeEvent
+    public static void onConsume(LivingEntityUseItemEvent.Finish event) {
+        var stack = event.getItem();
+        var tag = stack.getTag();
+        var entity = event.getEntity();
+
+        if (stack.isEdible() && tag != null && tag.contains("spices")) {
+            for (String s : tag.getCompound("spices").getAllKeys()) {
+                var effect = EffectStringUtil.getEffect(tag.getCompound("spices").getString(s));
+                if (effect != null)
+                    entity.addEffect(effect);
+            }
+        }
+    }
+    @SubscribeEvent
     public static void applySpice(ItemStackedOnOtherEvent event) {
         if (event.getClickAction() == ClickAction.SECONDARY && !event.getPlayer().getLevel().isClientSide()) {
-            Map<ResourceLocation, MobEffectInstance> spiceEffects = SPICE_EFFECTS_LOADER.getSpiceEffects();
+            Map<ResourceLocation, MobEffectInstance[]> spiceEffects = SPICE_EFFECTS_LOADER.getSpiceEffects();
 
             ItemStack stackedOn = event.getStackedOnItem();
             ItemStack carriedItem = event.getCarriedItem();
@@ -73,11 +88,21 @@ public class SpiceShelfEvents {
                 if (!stackedOn.is(SpiceShelfTags.SPICE_BLACKLIST) && !stackedOn.getOrCreateTag().getCompound("spices").contains(String.valueOf(spiceID))) {
                     event.setCanceled(true);
 
+                    var spices = stackedOn.getOrCreateTag().getCompound("spices");
+                    var effects = spiceEffects.get(spiceID);
+                    if (spices.getAllKeys().isEmpty()) {
+                        for (int i = 0; i < effects.length; i++) {
+                            spices.putString(spiceID.toString() + " " + i, EffectStringUtil.effectToString(effects[i]));
+                        }
+                    } else {
+                        var length = spices.getAllKeys().size();
+                        for (int i = length; i < effects.length + length; i++) {
+                            spices.putString(spiceID.toString() + " " + i, EffectStringUtil.effectToString(effects[i-length]));
+                        }
+                    }
+
                     // Give separate item if stack > 1
                     if (stackedOn.getCount() > 1) {
-                        var spices = stackedOn.getOrCreateTag().getCompound("spices");
-                        spices.putString(String.valueOf(spiceID), EffectStringUtil.effectToString(spiceEffects.get(spiceID)));
-
                         var stack = stackedOn.copy();
                         stack.setCount(1);
                         stack.getOrCreateTag().put("spices", spices);
@@ -86,9 +111,6 @@ public class SpiceShelfEvents {
                         stackedOn.shrink(1);
                     } else {
                         // Swap item if stack == 1
-                        var spices = stackedOn.getOrCreateTag().getCompound("spices");
-                        spices.putString(String.valueOf(spiceID), EffectStringUtil.effectToString(spiceEffects.get(spiceID)));
-
                         stackedOn.getOrCreateTag().put("spices", spices);
                     }
 
@@ -111,15 +133,31 @@ public class SpiceShelfEvents {
         if (tag != null && tag.contains("spices")) {
             var spicesTag = tag.getCompound("spices");
             var spices = spicesTag.getAllKeys().stream().toList();
-            spices.forEach(s -> event.getToolTip().add(spices.indexOf(s)+1, Component.translatable("spice." + StringUtils.replace(s, ":", "."))
-                    .withStyle(Objects.requireNonNull(EffectStringUtil.getEffect(spicesTag.getString(s))).getEffect().getCategory().getTooltipFormatting())));
+
+            for (String s : spices) {
+                var key = "spice." + StringUtils.replace(s.substring(0, s.indexOf(" ")), ":", ".");
+                var component = Component.translatable(key).withStyle(EffectStringUtil.getEffect(spicesTag.getString(s)).getEffect().getCategory().getTooltipFormatting());
+                if (!event.getToolTip().contains(component)) {
+                    event.getToolTip().add(spices.indexOf(s) + 1, component);
+                }
+            }
+            /*spices.forEach(s -> {
+                var component = Component.translatable("spice." + StringUtils.replace(s.substring(0, s.indexOf(" ")), ":", "."));
+                if (!event.getToolTip().contains(component)) {
+                    event.getToolTip().add(spices.indexOf(s) + 1, component
+                            .withStyle(Objects.requireNonNull(EffectStringUtil.getEffect(spicesTag.getString(s))).getEffect().getCategory().getTooltipFormatting()));
+                }
+            });*/
         }
-        if (SPICE_EFFECTS_LOADER.getSpiceEffects().containsKey(ForgeRegistries.ITEMS.getKey(stack.getItem()))) {
-            var spiceID = ForgeRegistries.ITEMS.getKey(stack.getItem());
-            var effect = SPICE_EFFECTS_LOADER.getSpiceEffects().get(spiceID);
+        var spiceID = ForgeRegistries.ITEMS.getKey(stack.getItem());
+        if (spiceID != null && SPICE_EFFECTS_LOADER.getSpiceEffects().get(spiceID) != null) {
+            var effects = SPICE_EFFECTS_LOADER.getSpiceEffects().get(spiceID);
             event.getToolTip().add(1, Component.translatable("spiceshelf.when_applied").withStyle(ChatFormatting.GRAY));
-            event.getToolTip().add(2, Component.literal(Component.translatable("spiceshelf.apply_effect").getString() + EffectStringUtil.effectToCoolerString(effect))
-                    .withStyle(effect.getEffect().getCategory().getTooltipFormatting()));
+            var i = 1;
+            for (MobEffectInstance effect : effects) {
+                event.getToolTip().add(++i, Component.literal(Component.translatable("spiceshelf.apply_effect").getString() + EffectStringUtil.effectToCoolerString(effect))
+                        .withStyle(effect.getEffect().getCategory().getTooltipFormatting()));
+            }
         }
     }
 

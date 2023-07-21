@@ -68,5 +68,5 @@ Data-driven applicable spices for all the foods!
    modId="jei"
    mandatory=false
    versionRange="[11.6.0.1015,)"
-   ordering="NONE"
+   ordering="BEFORE"
    side="BOTH"
