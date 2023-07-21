@@ -116,9 +116,14 @@ public class SpiceShelfEvents {
 
                     //Leave container behind
                     if (carriedItem.getItem().hasCraftingRemainingItem(carriedItem))
-                        event.getCarriedSlotAccess().set(carriedItem.getCraftingRemainingItem());
-                    else
+                        if (carriedItem.getCount() > 1) {
+                            ItemHandlerHelper.giveItemToPlayer(player, carriedItem.getCraftingRemainingItem());
+                            carriedItem.shrink(1);
+                        } else
+                            event.getCarriedSlotAccess().set(carriedItem.getCraftingRemainingItem());
+                    else {
                         carriedItem.shrink(1);
+                    }
 
                     playSoundFromID("", level, player.getOnPos());
                 }
