@@ -17,7 +17,7 @@ plugins {
 apply plugin: 'org.spongepowered.mixin'
 
 group = 'qinomed'
-version = '1.2'
+version = '1.2.1'
 
 java {
     archivesBaseName = 'spiceshelf'
