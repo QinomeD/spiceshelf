@@ -38,7 +38,7 @@ public class EffectStringUtil {
     public static String effectToCoolerString(MobEffectInstance effect) {
         var s = effect.getEffect().getDisplayName().getString();
         if (effect.getAmplifier() > 0)
-            s = s.concat(" " + Component.translatable("potion.potency." + effect.getAmplifier()));
+            s = s.concat(" " + Component.translatable("potion.potency." + effect.getAmplifier()).getString());
         if (effect.getDuration() > 20)
             s = s.concat(" (" + MobEffectUtil.formatDuration(effect, 1) + ")");
 
